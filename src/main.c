@@ -29,7 +29,9 @@ int main(void) {
 
     while (fgets(current_line, sizeof(current_line), historyfile) != NULL) {
         char *cmd = strtok(current_line, " \n");
-        if (cmd != NULL) head = add_cmd(head, cmd);
+        if (cmd == NULL) continue;
+        if (cmd[0] == '-') continue;
+        head = add_cmd(head, cmd);
     }
 
     sort_list(head);
