@@ -45,3 +45,12 @@ void sort_list(struct Entry *head) {
         }
     }
 }
+
+void free_list(struct Entry *head) {
+struct Entry *current = head;
+while (current != NULL) {
+struct Entry *next = current->next;
+free(current);
+current = next;
+    }
+}

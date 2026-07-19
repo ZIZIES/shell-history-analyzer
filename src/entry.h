@@ -15,4 +15,6 @@ void sort_list(struct Entry *head);
 
 void sort_list(struct Entry *head);
 
+void free_list(struct Entry *head);
+
 #endif
