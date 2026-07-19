@@ -1,5 +1,5 @@
-#mac i think
-.DS_STORE
+#OSX
+*.DS_STORE
 
 # Prerequisites
 *.d
