@@ -23,20 +23,6 @@ For example:
 
 ## Windows
 
-### Build with Visual Studio
-
-If you have Visual Studio with the **Desktop development with C++** workload,
-open a **Developer PowerShell for VS** and run:
-
-```powershell
-cd C:\path\to\shell-history-analyzer
-New-Item -ItemType Directory -Force build | Out-Null
-cl /nologo /W4 /std:c11 /D_CRT_SECURE_NO_WARNINGS /Fo:build\ /Fe:build\shis.exe src\entry.c src\history.c src\main.c src\util.c
-.\build\shis.exe
-```
-
-### Build with MSYS2
-
 1. Install [MSYS2](https://www.msys2.org/).
 2. Open the **MSYS2 UCRT64** terminal.
 3. Install the compiler and build tools:
