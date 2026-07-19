@@ -15,6 +15,8 @@ printf("shis - shell history analyzer\n\n");
 printf("usage: shis [options]\n\n");
 printf("  -c <n>        show top n commands (default 20)\n");
 printf("  -f, --full    show every command, no cap\n");
+printf("  -i, --history <path>\n");
+printf("                analyze a specific history file\n");
 printf("  -h, --help    show this\n\n");
 }
 
@@ -22,6 +24,7 @@ int main(int argc, char *argv[]) {
 char current_line[512];
 int rank = 0;
 int limit = 20;
+const char *history_path = NULL;
 
 for (int i = 1; i < argc; i++) {
 if (strcmp(argv[i], "--full") == 0 || strcmp(argv[i], "-f") == 0) {
@@ -36,15 +39,22 @@ return 1;
         }
 limit = atoi(argv[i + 1]);
 i++;
+    } else if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--history") == 0) {
+if (i + 1 >= argc) {
+printf("%s needs a file path\n", argv[i]);
+return 1;
+        }
+history_path = argv[i + 1];
+i++;
     } else {
 printf("dunno what '%s' is, try -h\n", argv[i]);
 return 1;
     }
 }
 
-FILE *historyfile = open_history();
+FILE *historyfile = open_history(history_path);
 if (historyfile == NULL) {
-printf("couldn't open ur history file, only bash and zsh for now :(\n");
+printf("couldn't open a supported history file; try --history <path>\n");
 newline(2);
 return 2;
     }
@@ -52,7 +62,7 @@ return 2;
 struct Entry *head = NULL;
 
 while (fgets(current_line, sizeof(current_line), historyfile) != NULL) {
-char *cmd = strtok(current_line, " \n");
+char *cmd = strtok(current_line, " \t\r\n");
 if (cmd == NULL) continue;
 if (cmd[0] == '-') continue;
 head = add_cmd(head, cmd);

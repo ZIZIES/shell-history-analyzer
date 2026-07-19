@@ -5,7 +5,11 @@
 struct Entry *add_cmd(struct Entry *head, char *cmd) {
     struct Entry *current = head;
     while (current != NULL) {
+#ifdef _WIN32
+        if (_stricmp(current->cmd, cmd) == 0) {
+#else
         if (strcmp(current->cmd, cmd) == 0) {
+#endif
             current->count++;
             return head;
         }
