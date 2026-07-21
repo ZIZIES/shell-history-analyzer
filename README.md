@@ -1,7 +1,17 @@
 # shell-history-analyzer
 
 `shis` shows which commands you use most often. It reads Bash, Zsh, Windows
-PowerShell, or PowerShell 7 history and prints a ranked list.
+PowerShell, or PowerShell 7 history and prints a ranked, color-coded bar graph.
+
+## Flags
+
+| Flag | Description |
+| --- | --- |
+| `-c <n>` | show the top n commands (default: 20) |
+| `-f, --full` | show every command, no cap |
+| `-i, --history <path>` | analyze a specific history file |
+| `-s, --sudo` | only graph commands run with sudo |
+| `-h, --help` | show help |
 
 ## Usage
 
@@ -11,6 +21,7 @@ shis [options]
   -c <n>                  show the top n commands (default: 20)
   -f, --full              show every command
   -i, --history <path>    analyze a specific history file
+  -s, --sudo              only graph commands run with sudo
   -h, --help              show help
 ```
 
@@ -19,7 +30,20 @@ For example:
 ```sh
 ./build/shis -c 10
 ./build/shis --full
+./build/shis --sudo -c 10
 ```
+
+Flags can be combined and used in any order, e.g.
+`./build/shis --history ~/.bash_history -c 5`.
+
+## Colors
+
+The bar for each command is colored like a heatmap, relative to your
+most-used command: blue is rare, red is frequent.
+
+Colors are skipped automatically when output isn't a real terminal (for
+example, piping into a file or `less`), and a note is printed to stderr when
+that happens. You can also disable colors yourself by setting `NO_COLOR=1`.
 
 ## Windows
 
@@ -92,3 +116,8 @@ To analyze another file:
 `shis` counts the first word on each history line. For example, `git status`
 and `git log` both count as `git`. On Windows, command names are compared without
 regard to letter casing.
+
+`sudo` is stripped from the front of a command before counting, so
+`sudo apt update` counts as `apt`, same as a plain `apt` command. Use
+`-s`/`--sudo` to flip this around and graph only the commands you've run
+with sudo, keyed by what came after it.
