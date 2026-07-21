@@ -30,6 +30,7 @@ printf("  -c <n>        show top n commands (default 20)\n");
 printf("  -f, --full    show every command, no cap\n");
 printf("  -i, --history <path>\n");
 printf("                analyze a specific history file\n");
+printf("  -s, --sudo    only graph commands run with sudo\n");
 printf("  -h, --help    show this\n\n");
 }
 
@@ -38,10 +39,13 @@ char current_line[512];
 int rank = 0;
 int limit = 20;
 const char *history_path = NULL;
+int sudo_only = 0;
 
 for (int i = 1; i < argc; i++) {
 if (strcmp(argv[i], "--full") == 0 || strcmp(argv[i], "-f") == 0) {
 limit = -1;
+    } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--sudo") == 0) {
+sudo_only = 1;
     } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 print_help();
 return 0;
@@ -78,10 +82,12 @@ while (fgets(current_line, sizeof(current_line), historyfile) != NULL) {
 char *cmd = strtok(current_line, " \t\r\n");
 if (cmd == NULL) continue;
 #ifdef _WIN32
-if (_stricmp(cmd, "sudo") == 0) cmd = strtok(NULL, " \t\r\n");
+int was_sudo = _stricmp(cmd, "sudo") == 0;
 #else
-if (strcmp(cmd, "sudo") == 0) cmd = strtok(NULL, " \t\r\n");
+int was_sudo = strcmp(cmd, "sudo") == 0;
 #endif
+if (was_sudo) cmd = strtok(NULL, " \t\r\n");
+if (sudo_only && !was_sudo) continue;
 if (cmd == NULL) continue;
 if (cmd[0] == '-') continue;
 head = add_cmd(head, cmd);
