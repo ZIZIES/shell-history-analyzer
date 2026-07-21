@@ -77,6 +77,12 @@ struct Entry *head = NULL;
 while (fgets(current_line, sizeof(current_line), historyfile) != NULL) {
 char *cmd = strtok(current_line, " \t\r\n");
 if (cmd == NULL) continue;
+#ifdef _WIN32
+if (_stricmp(cmd, "sudo") == 0) cmd = strtok(NULL, " \t\r\n");
+#else
+if (strcmp(cmd, "sudo") == 0) cmd = strtok(NULL, " \t\r\n");
+#endif
+if (cmd == NULL) continue;
 if (cmd[0] == '-') continue;
 head = add_cmd(head, cmd);
     }
