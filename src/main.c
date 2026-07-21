@@ -10,6 +10,19 @@
 //  2   -   couldn't open history file
 //-------------------------------------------------
 
+// coldest (least used) to hottest (most used)
+static const char *HEAT_COLORS[] = {
+    "\033[34m", "\033[36m", "\033[32m", "\033[33m", "\033[31m",
+};
+#define HEAT_STEPS (int)(sizeof(HEAT_COLORS) / sizeof(HEAT_COLORS[0]))
+#define COLOR_RESET "\033[0m"
+
+static const char *heat_color(int count, int max_count) {
+    int step = count * HEAT_STEPS / (max_count + 1);
+    if (step >= HEAT_STEPS) step = HEAT_STEPS - 1;
+    return HEAT_COLORS[step];
+}
+
 void print_help(void) {
 printf("shis - shell history analyzer\n\n");
 printf("usage: shis [options]\n\n");
@@ -69,11 +82,21 @@ head = add_cmd(head, cmd);
     }
 
 sort_list(head);
+
+int no_color_env = getenv("NO_COLOR") != NULL;
+int use_color = head != NULL && stdout_is_tty() && !no_color_env;
+if (head != NULL && !use_color && !no_color_env) {
+fprintf(stderr, "note: output isn't a terminal, dropping the colors\n");
+    }
+int max_count = head != NULL ? head->count : 0;
+
 struct Entry *current = head;
 while (current != NULL && (limit == -1 || rank < limit)) {
-printf("%-20.20s ", current->cmd);
+const char *color = use_color ? heat_color(current->count, max_count) : "";
+const char *reset = use_color ? COLOR_RESET : "";
+printf("%-20.20s %s", current->cmd, color);
 for (int i = 0; i < current->count / 5; i++) printf("█");
-printf(" %d\n", current->count);
+printf("%s %d\n", reset, current->count);
 current = current->next;
 rank++;
     }

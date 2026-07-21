@@ -3,4 +3,6 @@
 
 void newline(int times);
 
+int stdout_is_tty(void);
+
 #endif
